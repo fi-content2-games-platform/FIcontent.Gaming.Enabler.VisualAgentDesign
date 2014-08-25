@@ -1,0 +1,3 @@
+[submodule "LiveInspector/Assets/Aseba"]
+	path = LiveInspector/Assets/Aseba
+	url = git@github.com:fi-content2-games-platform/FIcontent.Gaming.Enabler.VisualAgentDesignInterface.Aseba.git
