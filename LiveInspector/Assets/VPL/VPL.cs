@@ -30,6 +30,14 @@ namespace Aseba
 		static Texture2D Tex_ProxEventBlock_Bg = Resources.Load<Texture2D>("ProxEventBlock.Bg");
 		static Texture2D Tex_ProxEventBlock_Near = Resources.Load<Texture2D>("ProxEventBlock.Near");
 		static Texture2D Tex_ProxEventBlock_Far = Resources.Load<Texture2D>("ProxEventBlock.Far");
+		// ProxGroundEventBlock
+		static Texture2D Tex_ProxGroundEventBlock_Bg = Resources.Load<Texture2D>("ProxGroundEventBlock.Bg");
+		static Texture2D Tex_ProxGroundEventBlock_Near = Resources.Load<Texture2D>("ProxGroundEventBlock.Near");
+		static Texture2D Tex_ProxGroundEventBlock_Far = Resources.Load<Texture2D>("ProxGroundEventBlock.Far");
+		// other events
+		static Texture2D Tex_TapEventBlock_Simple = Resources.Load<Texture2D>("TapEventBlock.Simple");
+		static Texture2D Tex_ClapEventBlock = Resources.Load<Texture2D>("ClapEventBlock");
+		static Texture2D Tex_TimeoutEventBlock = Resources.Load<Texture2D>("TimeoutEventBlock");
 		
 		// Helper functions
 		
@@ -100,6 +108,10 @@ namespace Aseba
 			{
 				case 1: curWord += CreateTextureButton(description, curWord, painter, blockSpacing, blockSpacing); break;
 				case 2: curWord += CreateTextureProx(description, curWord, painter, blockSpacing, blockSpacing); break;
+				case 3: curWord += CreateTextureProxGround(description, curWord, painter, blockSpacing, blockSpacing); break;
+				case 4: painter.Blit(blockSpacing, blockSpacing, Tex_TapEventBlock_Simple); curWord += 1; break;
+				case 5: painter.Blit(blockSpacing, blockSpacing, Tex_ClapEventBlock); break;
+				case 6: painter.Blit(blockSpacing, blockSpacing, Tex_TimeoutEventBlock); break;
 				default: break;
 			}
 			
@@ -155,6 +167,28 @@ namespace Aseba
 					painter.Blit(lx, ly, masks[i], Tex_ProxEventBlock_Near);
 				else if (buttons[i] == 2)
 					painter.Blit(lx, ly, masks[i], Tex_ProxEventBlock_Far);
+			}
+			
+			return 1;
+		}
+		
+		public static uint CreateTextureProxGround(ushort[] description, uint posInDescription, Painter painter, int lx, int ly)
+		{
+			// background
+			painter.Blit(lx, ly, Tex_ProxGroundEventBlock_Bg);
+			
+			// display sensor state: left then right
+			uint[] buttons = GetButtonsValues(description[posInDescription], 2, 3);
+			Scanlines[] masks = {
+				new Scanlines { { 197, 80, 115 }, { 198, 79, 116 }, { 199, 78, 116 }, { 200, 78, 116 }, { 201, 78, 116 }, { 202, 78, 116 }, { 203, 78, 116 }, { 204, 78, 116 }, { 205, 67, 116 }, { 206, 65, 116 }, { 207, 64, 116 }, { 208, 63, 116 }, { 209, 63, 116 }, { 210, 62, 116 }, { 211, 62, 116 }, { 212, 61, 116 }, { 213, 61, 116 }, { 214, 61, 116 }, { 215, 61, 116 }, { 216, 61, 116 }, { 217, 61, 116 }, { 218, 61, 116 }, { 219, 61, 116 }, { 220, 62, 116 }, { 221, 62, 116 }, { 222, 63, 116 }, { 223, 64, 116 }, { 224, 65, 116 }, { 225, 66, 116 }, { 226, 69, 116 }, { 227, 78, 116 }, { 228, 78, 116 }, { 229, 78, 116 }, { 230, 78, 116 }, { 231, 78, 116 }, { 232, 79, 116 }, { 233, 79, 116 }, { 234, 80, 114 } },
+				new Scanlines { { 197, 140, 175 }, { 198, 139, 176 }, { 199, 138, 176 }, { 200, 138, 176 }, { 201, 138, 176 }, { 202, 138, 176 }, { 203, 138, 176 }, { 204, 138, 176 }, { 205, 138, 188 }, { 206, 138, 189 }, { 207, 138, 190 }, { 208, 138, 191 }, { 209, 138, 192 }, { 210, 138, 193 }, { 211, 138, 193 }, { 212, 138, 194 }, { 213, 138, 194 }, { 214, 138, 194 }, { 215, 138, 194 }, { 216, 138, 194 }, { 217, 138, 194 }, { 218, 138, 194 }, { 219, 138, 193 }, { 220, 138, 193 }, { 221, 138, 193 }, { 222, 138, 192 }, { 223, 138, 191 }, { 224, 138, 190 }, { 225, 138, 188 }, { 226, 138, 186 }, { 227, 138, 176 }, { 228, 138, 176 }, { 229, 138, 176 }, { 230, 138, 176 }, { 231, 138, 176 }, { 232, 139, 176 }, { 233, 139, 176 }, { 234, 140, 174 } }
+			};
+			for (uint i=0; i<2; ++i)
+			{
+				if (buttons[i] == 1)
+					painter.Blit(lx, ly, masks[i], Tex_ProxGroundEventBlock_Near);
+				else if (buttons[i] == 2)
+					painter.Blit(lx, ly, masks[i], Tex_ProxGroundEventBlock_Far);
 			}
 			
 			return 1;
