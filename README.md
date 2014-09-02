@@ -7,6 +7,7 @@ This SE gives access to the [Aseba network](http://thymio.org) and the [Visual P
 It does this by providing the following C# libarires:
  * Aseba network interface in `LiveInspector/Assets/Aseba`
  * Visual Programming Language renderer in `LiveInspector/Assets/VPL`
+
 In addition, this repository provides a VPL live inspector which is an augmented reality visual debugger for VPL.
 This inspector is used both as a demonstration and to run experiments.
 
