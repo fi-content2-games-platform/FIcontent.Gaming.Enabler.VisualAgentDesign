@@ -38,6 +38,14 @@ namespace Aseba
 		static Texture2D Tex_TapEventBlock_Simple = Resources.Load<Texture2D>("TapEventBlock.Simple");
 		static Texture2D Tex_ClapEventBlock = Resources.Load<Texture2D>("ClapEventBlock");
 		static Texture2D Tex_TimeoutEventBlock = Resources.Load<Texture2D>("TimeoutEventBlock");
+		// action black background
+		static Texture2D Tex_ActionBlock_Bg = Resources.Load<Texture2D>("ActionBlock.Bg");
+		// ColorActionBlock
+		static Texture2D Tex_ColorActionBlock_Sliders = Resources.Load<Texture2D>("ColorActionBlock.Sliders");
+		static Texture2D Tex_ColorActionBlock_Handle = Resources.Load<Texture2D>("ColorActionBlock.Handle");
+		static Texture2D Tex_ColorBottomActionBlock_Body = Resources.Load<Texture2D>("ColorBottomActionBlock.Body");
+		static Texture2D Tex_ColorBottomActionBlock_Ball = Resources.Load<Texture2D>("ColorBottomActionBlock.Ball");
+		static Texture2D Tex_ColorTopActionBlock_Body = Resources.Load<Texture2D>("ColorTopActionBlock.Body");
 		// SoundActionBlock
 		static Texture2D Tex_SoundActionBlock_Bg = Resources.Load<Texture2D>("SoundActionBlock.Bg");
 		static Texture2D Tex_SoundActionBlock_BlackNote = Resources.Load<Texture2D>("SoundActionBlock.BlackNote");
@@ -114,9 +122,9 @@ namespace Aseba
 				case 1: curWord += CreateTextureButton(description, curWord, painter, blockSpacing, blockSpacing); break;
 				case 2: curWord += CreateTextureProx(description, curWord, painter, blockSpacing, blockSpacing); break;
 				case 3: curWord += CreateTextureProxGround(description, curWord, painter, blockSpacing, blockSpacing); break;
-				case 4: painter.Blit(blockSpacing, blockSpacing, Tex_TapEventBlock_Simple); curWord += 1; break;
-				case 5: painter.Blit(blockSpacing, blockSpacing, Tex_ClapEventBlock); break;
-				case 6: painter.Blit(blockSpacing, blockSpacing, Tex_TimeoutEventBlock); break;
+				case 4: painter.BlitSrcAlpha(blockSpacing, blockSpacing, Tex_TapEventBlock_Simple); curWord += 1; break;
+				case 5: painter.BlitSrcAlpha(blockSpacing, blockSpacing, Tex_ClapEventBlock); break;
+				case 6: painter.BlitSrcAlpha(blockSpacing, blockSpacing, Tex_TimeoutEventBlock); break;
 				default: break;
 			}
 			
@@ -128,8 +136,8 @@ namespace Aseba
 				switch (blockTypes[i])
 				{
 					case 8: curWord += CreateTextureMove(description, curWord, painter, actionsPosX, blockSpacing); break;
-					case 9: curWord += CreateTextureColorTop(description, curWord, painter, actionsPosX, blockSpacing);  break;
-					case 10: curWord += CreateTextureColorBottom(description, curWord, painter, actionsPosX, blockSpacing);  break;
+					case 9: curWord += CreateTextureColor(description, curWord, painter, actionsPosX, blockSpacing, false);  break;
+					case 10: curWord += CreateTextureColor(description, curWord, painter, actionsPosX, blockSpacing, true);  break;
 					case 11: curWord += CreateTextureSound(description, curWord, painter, actionsPosX, blockSpacing);  break;
 					case 12: curWord += CreateTextureTimer(description, curWord, painter, actionsPosX, blockSpacing);  break;
 					// TODO: set state
@@ -150,7 +158,7 @@ namespace Aseba
 		public static uint CreateTextureButton(ushort[] description, uint posInDescription, Painter painter, int lx, int ly)
 		{
 			// background
-			painter.Blit(lx, ly, Tex_ArrowButtonsEventBlock_Bg);
+			painter.BlitSrcAlpha(lx, ly, Tex_ArrowButtonsEventBlock_Bg);
 			
 			// display button state: top, left, bottom, right, center
 			uint[] buttons = GetButtonsValues(description[posInDescription], 5, 2);
@@ -172,7 +180,7 @@ namespace Aseba
 		public static uint CreateTextureProx(ushort[] description, uint posInDescription, Painter painter, int lx, int ly)
 		{
 			// background
-			painter.Blit(lx, ly, Tex_ProxEventBlock_Bg);
+			painter.BlitSrcAlpha(lx, ly, Tex_ProxEventBlock_Bg);
 			
 			// display sensor state: front left to right, then back left to right
 			uint[] buttons = GetButtonsValues(description[posInDescription], 7, 3);
@@ -199,7 +207,7 @@ namespace Aseba
 		public static uint CreateTextureProxGround(ushort[] description, uint posInDescription, Painter painter, int lx, int ly)
 		{
 			// background
-			painter.Blit(lx, ly, Tex_ProxGroundEventBlock_Bg);
+			painter.BlitSrcAlpha(lx, ly, Tex_ProxGroundEventBlock_Bg);
 			
 			// display sensor state: left then right
 			uint[] buttons = GetButtonsValues(description[posInDescription], 2, 3);
@@ -223,19 +231,36 @@ namespace Aseba
 			return 1;
 		}
 		
-		public static uint CreateTextureColorTop(ushort[] description, uint posInDescription, Painter painter, int lx, int ly)
+		public static uint CreateTextureColor(ushort[] description, uint posInDescription, Painter painter, int lx, int ly, bool bottom)
 		{
-			return 1;
-		}
-		
-		public static uint CreateTextureColorBottom(ushort[] description, uint posInDescription, Painter painter, int lx, int ly)
-		{
+			painter.BlitSrcAlpha(lx, ly, Tex_ActionBlock_Bg);
+			
+			uint[] components = GetButtonsValues(description[posInDescription], 3, 33);
+			Color32 color = new Color32(
+				(byte)((float)components[0]*5.46875+80),
+				(byte)((float)components[1]*5.46875+80),
+				(byte)((float)components[2]*5.46875+80),
+				255
+			);
+			if (bottom)
+			{
+				painter.BlitTint(lx, ly, Tex_ColorBottomActionBlock_Body, color);
+				painter.BlitSrcAlpha(lx+112, ly+256-32-24, Tex_ColorBottomActionBlock_Ball);
+			}
+			else
+				painter.BlitTint(lx, ly, Tex_ColorTopActionBlock_Body, color);
+			
+			painter.BlitSrcAlpha(lx, ly, Tex_ColorActionBlock_Sliders);
+			
+			for (uint i=0; i<3; ++i)
+				painter.Blit(lx + 27 + ((int)components[i]*158)/33, ly + 148 - ((int)i*64), Tex_ColorActionBlock_Handle);
+			
 			return 1;
 		}
 		
 		public static uint CreateTextureSound(ushort[] description, uint posInDescription, Painter painter, int lx, int ly)
 		{
-			painter.Blit(lx, ly, Tex_SoundActionBlock_Bg);
+			painter.BlitSrcAlpha(lx, ly, Tex_SoundActionBlock_Bg);
 			
 			uint[] notes = GetButtonsValues(description[posInDescription], 6, 6);
 			uint[] durations = GetButtonsValues(description[posInDescription+1], 6, 3);

@@ -6,7 +6,7 @@ This repository will contain the Visual Agent Design Interface Specific Enabler 
 This SE gives access to the [Aseba network](http://thymio.org) and the [Visual Programming Language](https://aseba.wikidot.com/en:thymiovpl) to Unity developers.
 It does this by providing the following C# libarires:
  * Aseba network interface in `LiveInspector/Assets/Aseba`
- * Visual Programming Language renderer in `LiveInspector/Assets/VPL`
+ * Visual Programming Language renderer in `LiveInspector/Assets/VPL` (including a library of various blitting function operating on arrays of Color32)
 
 In addition, this repository provides a VPL live inspector which is an augmented reality visual debugger for VPL.
 This inspector is used both as a demonstration and to run experiments.

@@ -77,6 +77,8 @@ namespace Aseba
 			Blit(0, 0, lines, source);
 		}
 		
+		// note: BlitTint uses src-alpha
+		
 		public void BlitTint(int x, int y, Texture2D source, Color32 tint)
 		{
 			uint tintR = tint.r;
@@ -91,10 +93,11 @@ namespace Aseba
 				for (int dx = 0; dx < source.width; ++dx)
 				{
 					Color32 sc = pixels[dy*source.width + dx];
+					Color32 dc = targetPixels[(y+dy)*tw + (x+dx)];
 					Color32 c = new Color32(
-						(byte)(((uint)sc.r * tintR) / 255),
-						(byte)(((uint)sc.g * tintG) / 255),
-						(byte)(((uint)sc.b * tintB) / 255),
+						(byte)(((((uint)sc.r * tintR) / 255) * sc.a + dc.r * (255-sc.a)) / 255),
+						(byte)(((((uint)sc.g * tintG) / 255) * sc.a + dc.g * (255-sc.a)) / 255),
+						(byte)(((((uint)sc.b * tintB) / 255) * sc.a + dc.b * (255-sc.a)) / 255),
 						sc.a
 					);
 					targetPixels[(y+dy)*tw + (x+dx)] = c;
