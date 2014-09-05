@@ -77,6 +77,62 @@ namespace Aseba
 			Blit(0, 0, lines, source);
 		}
 		
+		public void BlitTint(int x, int y, Texture2D source, Color32 tint)
+		{
+			uint tintR = tint.r;
+			uint tintG = tint.g;
+			uint tintB = tint.b;
+			Dbg.Assert (0 < x, "Access out of bounds on x: underflow");
+			Dbg.Assert (x < tw-source.width, "Access out of bounds on x: overflow");
+			Dbg.Assert (0 < y, "Access out of bounds on y: underflow");
+			Dbg.Assert (y < th-source.height, "Access out of bounds on y: overflow");
+			Color32[] pixels = source.GetPixels32();
+			for (int dy = 0; dy < source.height; ++dy)
+				for (int dx = 0; dx < source.width; ++dx)
+				{
+					Color32 sc = pixels[dy*source.width + dx];
+					Color32 c = new Color32(
+						(byte)(((uint)sc.r * tintR) / 255),
+						(byte)(((uint)sc.g * tintG) / 255),
+						(byte)(((uint)sc.b * tintB) / 255),
+						sc.a
+					);
+					targetPixels[(y+dy)*tw + (x+dx)] = c;
+				}
+		}
+		
+		public void BlitTint(Texture2D source, Color32 tint)
+		{
+			BlitTint(0, 0, source, tint);
+		}
+		
+		public void BlitSrcAlpha(int x, int y, Texture2D source)
+		{
+			Dbg.Assert (0 < x, "Access out of bounds on x: underflow");
+			Dbg.Assert (x < tw-source.width, "Access out of bounds on x: overflow");
+			Dbg.Assert (0 < y, "Access out of bounds on y: underflow");
+			Dbg.Assert (y < th-source.height, "Access out of bounds on y: overflow");
+			Color32[] pixels = source.GetPixels32();
+			for (int dy = 0; dy < source.height; ++dy)
+				for (int dx = 0; dx < source.width; ++dx)
+				{
+					Color32 sc = pixels[dy*source.width + dx];
+					Color32 dc = targetPixels[(y+dy)*tw + (x+dx)];
+					Color32 c = new Color32(
+						(byte)((sc.r * sc.a + dc.r * (255-sc.a)) / 255),
+						(byte)((sc.g * sc.a + dc.g * (255-sc.a)) / 255),
+						(byte)((sc.b * sc.a + dc.b * (255-sc.a)) / 255),
+						dc.a
+					);
+					targetPixels[(y+dy)*tw + (x+dx)] = c;
+				}
+		}
+		
+		public void BlitSrcAlpha(Texture2D source)
+		{
+			BlitSrcAlpha(0, 0, source);
+		}
+		
 		// Fill
 		
 		public void Fill(int x, int y, int w, int h, Color32 color)
