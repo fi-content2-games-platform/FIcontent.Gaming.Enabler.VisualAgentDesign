@@ -44,7 +44,7 @@ namespace Aseba
 			this.th = th;
 		}
 		
-		// Blit
+		// Basic Blit, copy alpha
 		
 		public void Blit(int x, int y, Texture2D source)
 		{
@@ -63,6 +63,8 @@ namespace Aseba
 			Blit(0, 0, source);
 		}
 		
+		// Blit with mask
+		
 		public void Blit(int x, int y, Scanlines lines, Texture2D source)
 		{
 			// Note: no boundary check here because in our python script we trust!
@@ -77,7 +79,36 @@ namespace Aseba
 			Blit(0, 0, lines, source);
 		}
 		
-		// note: BlitTint uses src-alpha
+		// Blit with src alpha
+		
+		public void BlitSrcAlpha(int x, int y, Texture2D source)
+		{
+			Dbg.Assert (0 < x, "Access out of bounds on x: underflow");
+			Dbg.Assert (x < tw-source.width, "Access out of bounds on x: overflow");
+			Dbg.Assert (0 < y, "Access out of bounds on y: underflow");
+			Dbg.Assert (y < th-source.height, "Access out of bounds on y: overflow");
+			Color32[] pixels = source.GetPixels32();
+			for (int dy = 0; dy < source.height; ++dy)
+				for (int dx = 0; dx < source.width; ++dx)
+				{
+					Color32 sc = pixels[dy*source.width + dx];
+					Color32 dc = targetPixels[(y+dy)*tw + (x+dx)];
+					Color32 c = new Color32(
+						(byte)((sc.r * sc.a + dc.r * (255-sc.a)) / 255),
+						(byte)((sc.g * sc.a + dc.g * (255-sc.a)) / 255),
+						(byte)((sc.b * sc.a + dc.b * (255-sc.a)) / 255),
+						dc.a
+					);
+					targetPixels[(y+dy)*tw + (x+dx)] = c;
+				}
+		}
+		
+		public void BlitSrcAlpha(Texture2D source)
+		{
+			BlitSrcAlpha(0, 0, source);
+		}
+		
+		// Blit and recolorize, uses src-alpha
 		
 		public void BlitTint(int x, int y, Texture2D source, Color32 tint)
 		{
@@ -109,17 +140,33 @@ namespace Aseba
 			BlitTint(0, 0, source, tint);
 		}
 		
-		public void BlitSrcAlpha(int x, int y, Texture2D source)
+		// Blit and rotate, uses src-alpha
+		
+		// copy source by rotating it by angle (in radian), rotating around its center.
+		public void BlitRotation(int x, int y, Texture2D source, double angle)
 		{
-			Dbg.Assert (0 < x, "Access out of bounds on x: underflow");
-			Dbg.Assert (x < tw-source.width, "Access out of bounds on x: overflow");
-			Dbg.Assert (0 < y, "Access out of bounds on y: underflow");
-			Dbg.Assert (y < th-source.height, "Access out of bounds on y: overflow");
+			double r = Math.Sqrt((double)source.width*(double)source.width + (double)source.height*(double)source.height);
+			int ir = (int)Math.Ceiling(r);
+			Dbg.Assert (r < x, "Access out of bounds on x: underflow");
+			Dbg.Assert (x < tw-r, "Access out of bounds on x: overflow");
+			Dbg.Assert (r < y, "Access out of bounds on y: underflow");
+			Dbg.Assert (y < th-r, "Access out of bounds on y: overflow");
 			Color32[] pixels = source.GetPixels32();
-			for (int dy = 0; dy < source.height; ++dy)
-				for (int dx = 0; dx < source.width; ++dx)
+			double cx = (double)source.width / 2;
+			double cy = (double)source.height / 2;
+			double sina = Math.Sin(-angle);
+			double cosa = Math.Cos(-angle);
+			for (int dy = -ir; dy < ir; ++dy)
+				for (int dx = -ir; dx < ir; ++dx)
 				{
-					Color32 sc = pixels[dy*source.width + dx];
+					// get source coordinate
+					int sx = (int)((double)dx * cosa - (double)dy * sina + cx);
+					int sy = (int)((double)dx * sina + (double)dy * cosa + cy);
+					// check overflow in source
+					if (sx<0 || sy<0 || sx>=source.width || sy>=source.height)
+						continue;
+					// if ok, blit pixel
+					Color32 sc = pixels[sy*source.width + sx];
 					Color32 dc = targetPixels[(y+dy)*tw + (x+dx)];
 					Color32 c = new Color32(
 						(byte)((sc.r * sc.a + dc.r * (255-sc.a)) / 255),
@@ -129,11 +176,6 @@ namespace Aseba
 					);
 					targetPixels[(y+dy)*tw + (x+dx)] = c;
 				}
-		}
-		
-		public void BlitSrcAlpha(Texture2D source)
-		{
-			BlitSrcAlpha(0, 0, source);
 		}
 		
 		// Fill
