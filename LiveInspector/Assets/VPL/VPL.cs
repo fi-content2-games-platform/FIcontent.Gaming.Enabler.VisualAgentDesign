@@ -40,6 +40,10 @@ namespace Aseba
 		static Texture2D Tex_TimeoutEventBlock = Resources.Load<Texture2D>("TimeoutEventBlock");
 		// action black background
 		static Texture2D Tex_ActionBlock_Bg = Resources.Load<Texture2D>("ActionBlock.Bg");
+		// MoveActionBlock
+		static Texture2D Tex_MoveActionBlock_SlidersBg = Resources.Load<Texture2D>("MoveActionBlock.SlidersBg");
+		static Texture2D Tex_MoveActionBlock_Handle = Resources.Load<Texture2D>("MoveActionBlock.Handle");
+		static Texture2D Tex_MoveActionBlock_Thymio = Resources.Load<Texture2D>("MoveActionBlock.Thymio");
 		// ColorActionBlock
 		static Texture2D Tex_ColorActionBlock_Sliders = Resources.Load<Texture2D>("ColorActionBlock.Sliders");
 		static Texture2D Tex_ColorActionBlock_Handle = Resources.Load<Texture2D>("ColorActionBlock.Handle");
@@ -228,6 +232,42 @@ namespace Aseba
 		
 		public static uint CreateTextureMove(ushort[] description, uint posInDescription, Painter painter, int lx, int ly)
 		{
+			// get speeds
+			int leftSpeed = (int)((description[posInDescription] >> 8) & 0xFF) - 10;
+			int rightSpeed = (int)((description[posInDescription] >> 0) & 0xFF) - 10;
+			Debug.Log(String.Format("speeds {0} {1}", leftSpeed, rightSpeed));
+			
+			// background
+			painter.BlitSrcAlpha(lx, ly, Tex_ActionBlock_Bg);
+			
+			// thymio
+			// ugly computation matching the one in VPL
+			double v_l = leftSpeed * 3;
+			double v_r = rightSpeed * 3;
+			double step = 0.75;
+			double angle = (v_l - v_r)*3*step;
+			double radAngle = angle*Math.PI/180;
+			double posX, posY;
+			if (Math.Abs(v_r-v_l) < 10e-4)
+			{
+				posX = 0;
+				posY = (v_l+v_r)*1.2*step;
+			}
+			else
+			{
+				double center = -23.5*(v_r+v_l)/(v_r-v_l);
+				posX = center*(1-Math.Cos(-radAngle));
+				posY = -center*Math.Sin(-radAngle);
+			}
+			painter.BlitRotation(lx+128+(int)posX, ly+128+14+(int)posY, Tex_MoveActionBlock_Thymio, -radAngle);
+			
+			// sliders
+			painter.BlitSrcAlpha(lx, ly, Tex_MoveActionBlock_SlidersBg);
+			
+			// handles
+			painter.BlitSrcAlpha(lx + 10, ly + 104 + (leftSpeed * 89) / 10, Tex_MoveActionBlock_Handle);
+			painter.BlitSrcAlpha(lx + 198, ly + 104 + (rightSpeed * 89) / 10, Tex_MoveActionBlock_Handle);
+			
 			return 1;
 		}
 		
