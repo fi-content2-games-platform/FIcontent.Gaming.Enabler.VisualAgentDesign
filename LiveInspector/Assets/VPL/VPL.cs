@@ -54,6 +54,9 @@ namespace Aseba
 		static Texture2D Tex_SoundActionBlock_Bg = Resources.Load<Texture2D>("SoundActionBlock.Bg");
 		static Texture2D Tex_SoundActionBlock_BlackNote = Resources.Load<Texture2D>("SoundActionBlock.BlackNote");
 		static Texture2D Tex_SoundActionBlock_WhiteNote = Resources.Load<Texture2D>("SoundActionBlock.WhiteNote");
+		// TimerActionBlock
+		static Texture2D Tex_TimerActionBlock_Quadrant = Resources.Load<Texture2D>("TimerActionBlock.Quadrant");
+		static Texture2D Tex_TimerActionBlock_Needle = Resources.Load<Texture2D>("TimerActionBlock.Needle");
 		
 		// Helper functions
 		
@@ -318,6 +321,19 @@ namespace Aseba
 		
 		public static uint CreateTextureTimer(ushort[] description, uint posInDescription, Painter painter, int lx, int ly)
 		{
+			// background
+			painter.BlitSrcAlpha(lx, ly, Tex_ActionBlock_Bg);
+			
+			// quadrant
+			painter.BlitSrcAlpha(lx, ly, Tex_TimerActionBlock_Quadrant);
+			
+			// duration
+			ushort durationMs = description[posInDescription];
+			double angle = (double)durationMs * Math.PI / 2000;
+			painter.FillArc(lx + 128, ly + 120, 50, angle, new Color32(0,0,8*16, 255));
+			
+			// needle
+			painter.BlitRotation(lx + 128, ly + 120, Tex_TimerActionBlock_Needle, -angle);
 			
 			return 1;
 		}
