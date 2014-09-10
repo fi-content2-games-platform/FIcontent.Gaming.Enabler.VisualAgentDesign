@@ -29,6 +29,7 @@ namespace Aseba
 		}
 	};
 
+	// the Painter assume the coordinate system of an image in memory, which might be different than the default mapping to quads in Unity
 	class Painter
 	{
 		private Color32[] targetPixels;
@@ -194,6 +195,56 @@ namespace Aseba
 		public void Fill(Color32 color)
 		{
 			Fill(0, 0, tw, th, color);
+		}
+		
+		// Fill arc, r is the radius and angle is in radian, the arc starts from the bottom of the vertical line and goes counterclockwise
+		
+		public void FillArc(int x, int y, int r, double angle, Color32 color)
+		{
+			Dbg.Assert (r < x, "Access out of bounds on x: underflow");
+			Dbg.Assert (x < tw-r, "Access out of bounds on x: overflow");
+			Dbg.Assert (r < y, "Access out of bounds on y: underflow");
+			Dbg.Assert (y < th-r, "Access out of bounds on y: overflow");
+			double dr2 = (double)(r*r);
+			// top-left quarter
+			if (angle > Math.PI)
+				for (int dy = r; dy > 0; --dy)
+				{
+					int startX = (int)Math.Min(
+						angle < 3*Math.PI/2 ? Math.Tan(angle) * (double)dy : double.PositiveInfinity,
+						Math.Sqrt(dr2 - dy*dy)
+					);
+					for (int dx = startX; dx > 0; --dx)
+						targetPixels[(y-dy)*tw + (x-dx)] = color;
+				}
+			// top-right quarter
+			if (angle > Math.PI/2)
+				for (int dy = r; dy > 0; --dy)
+				{
+					int startX = angle < Math.PI ? (int)((double)dy * Math.Tan(-angle)) : 0;
+					int stopX = (int)Math.Sqrt(dr2 - dy*dy);
+					for (int dx = startX; dx < stopX; ++dx)
+						targetPixels[(y-dy)*tw + (x+dx)] = color;
+				}
+			// bottom-left quarter
+			if (angle > 3*Math.PI/2)
+				for (int dy = 0; dy < r; ++dy)
+				{
+					int startX = (int)Math.Sqrt(dr2 - dy*dy);
+					int stopX = (int)((double)dy * Math.Tan(-angle));
+					for (int dx = startX; dx > stopX; --dx)
+						targetPixels[(y+dy)*tw + (x-dx)] = color;
+				}
+			// bottom-right quarter
+			for (int dy = 0; dy < r; ++dy)
+			{
+				int stopX = (int)Math.Min(
+					angle < Math.PI/2 ? Math.Tan(angle) * (double)dy : double.PositiveInfinity,
+					Math.Sqrt(dr2 - dy*dy)
+				);
+				for (int dx = 0; dx < stopX; ++dx)
+					targetPixels[(y+dy)*tw + (x+dx)] = color;
+			}
 		}
 	};
 }
