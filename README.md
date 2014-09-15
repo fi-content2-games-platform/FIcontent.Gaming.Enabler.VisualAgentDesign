@@ -1,5 +1,5 @@
-Visual Agent Design Interface
-=============================
+Visual Agent Design 
+===================
 
 This repository will contain the Visual Agent Design Interface Specific Enabler (SE) of the FIcontent Pervasive Games Platform.
 
@@ -16,7 +16,7 @@ Download
 
 You can clone this repository:
 
-    git clone --recursive https://github.com/fi-content2-games-platform/FIcontent.Gaming.Enabler.VisualAgentDesignInterface.git
+    git clone --recursive https://github.com/fi-content2-games-platform/FIcontent.Gaming.Enabler.VisualAgentDesign.git
 
 Usage
 -----
