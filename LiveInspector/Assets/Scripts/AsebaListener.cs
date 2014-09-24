@@ -164,13 +164,14 @@ public class AsebaListener : MonoBehaviour
 		// simple scroll
 		if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
 		{
-			timelineViewStart -= Input.GetTouch(0).deltaPosition.x * deltaTimeView / Screen.width;
-			timelineViewStop -= Input.GetTouch(0).deltaPosition.x * deltaTimeView / Screen.width;
+			float delta = -Input.GetTouch(0).deltaPosition.x * deltaTimeView / Screen.width;
+			if (timelineViewStart + delta < recordingStartTime)
+				delta = recordingStartTime - timelineViewStart;
+			if (timelineViewStop + delta > recordingStartTime + recordingDuration)
+				delta = recordingStartTime + recordingDuration - timelineViewStop;
 			
-			// clamp time
-			timelineViewStart = Math.Max(timelineViewStart, recordingStartTime);
-			timelineViewStop = Math.Min(timelineViewStop, recordingStartTime + recordingDuration);
-			
+			timelineViewStart += delta;
+			timelineViewStop += delta;
 			TimelineViewUpdated();
 			
 			return;
@@ -384,6 +385,10 @@ public class AsebaListener : MonoBehaviour
 		
 		// check if not already in the timeline
 		if (timeline.IsOngoingExtend(setId))
+			return;
+			
+		// check if we are tracking correctly
+		if (!boardIsTracked || !thymioIsTracked)
 			return;
 		
 		// create texture if needed
