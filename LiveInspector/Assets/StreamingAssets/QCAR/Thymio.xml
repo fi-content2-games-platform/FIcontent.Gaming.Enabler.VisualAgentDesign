@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
+  <Tracking>
+    <ImageTarget name="ThymioTop5" size="0.108000 0.106457" />
+    <ImageTarget name="BoardA1_1" size="0.42000000 0.29715000" />
+    <ImageTarget name="BoardA1_2" size="0.42000000 0.29715000" />
+    <ImageTarget name="BoardA1_3" size="0.42000000 0.29715000" />
+    <ImageTarget name="BoardA1_4" size="0.42000000 0.29715000" />
+    <MultiTarget name="BoardMulti">
+      <Part name="BoardA1_1" translation="-0.21 0.148575 0" rotation="AD: 1 0 0 0"/>
+	  <Part name="BoardA1_2" translation="0.21 0.148575 0" rotation="AD: 1 0 0 0"/>
+	  <Part name="BoardA1_3" translation="-0.21 -0.148575 0" rotation="AD: 1 0 0 0"/>
+	  <Part name="BoardA1_4" translation="0.21 -0.148575 0" rotation="AD: 1 0 0 0"/>
+    </MultiTarget>
+  </Tracking>
+</QCARConfig>

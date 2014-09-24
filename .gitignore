@@ -24,5 +24,8 @@ LiveInspector/*.sln
 ehthumbs.db
 Thumbs.db
 
+# packages
+*.apk
+
 # temp directory for playgrounding
 scratch/
