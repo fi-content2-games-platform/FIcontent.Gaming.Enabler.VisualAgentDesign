@@ -27,5 +27,5 @@ From Unity, simply opens the LiveInspector directory as a project, and open `Liv
 Contact
 -------
 
-Legal Contact: Marcel Lancelle (marcel dot lancelle at ethz dot ch)
-Technical Contact: Stéphane Magnenat (stephane dot magnenat at disneyresearch dot com)
+ * Legal Contact: Marcel Lancelle (marcel dot lancelle at ethz dot ch)
+ * Technical Contact: Stéphane Magnenat (stephane dot magnenat at disneyresearch dot com)
