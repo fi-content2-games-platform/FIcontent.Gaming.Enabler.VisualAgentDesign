@@ -23,3 +23,9 @@ Usage
 
 You need Unity3D (tested with Pro version 4.5.3f3) to use this SE.
 From Unity, simply opens the LiveInspector directory as a project, and open `LiveInspector/Assets/DefaultScene.unity`
+
+Contact
+-------
+
+Legal Contact: Marcel Lancelle (marcel dot lancelle at ethz dot ch)
+Technical Contact: Stéphane Magnenat (stephane dot magnenat at disneyresearch dot com)
