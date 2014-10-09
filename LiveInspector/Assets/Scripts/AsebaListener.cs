@@ -45,9 +45,12 @@ public class AsebaListener : MonoBehaviour
 	// Connect to the Aseba network
 	void Start ()
 	{
+		if (PlayerPrefs.HasKey("targetName"))
+			targetName = PlayerPrefs.GetString("targetName");
 		stream = new Aseba.Stream();
 		stream.messageCallback = ReceiveEvent;
 		stream.disconnectionCallback = NetworkDisconnected;
+		InvokeRepeating("SendStats", 1, 1);
 		TryToConnect();
 	}
 	
@@ -122,7 +125,10 @@ public class AsebaListener : MonoBehaviour
 	{
 		stream.Connect(targetName);
 		if (stream.Connected)
+		{
+			PlayerPrefs.SetString("targetName", targetName);
 			StartRecording();
+		}
 	}
 	
 	// Start the recording and reset the timeline
@@ -354,6 +360,18 @@ public class AsebaListener : MonoBehaviour
 	public void NetworkDisconnected()
 	{
 		Clear();
+	}
+	
+	// Every second, send stats to the client
+	public void SendStats()
+	{
+		if (stream.Connected)
+		{
+			ushort[] data = new ushort[14];
+			for (ushort i=0; i<14; ++i)
+				data[i] = i;
+			stream.SendAsebaMessage(0, 1, data); 
+		}
 	}
 	
 	// Delegate for messages
