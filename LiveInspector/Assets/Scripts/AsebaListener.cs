@@ -368,8 +368,53 @@ public class AsebaListener : MonoBehaviour
 		if (stream.Connected)
 		{
 			ushort[] data = new ushort[14];
-			for (ushort i=0; i<14; ++i)
-				data[i] = i;
+			
+			// content
+			if (boardIsTracked)
+			{
+				// camera x,y,z (in mm) and x,y,z angles (in 1/10 of degrees)
+				data[0] = unchecked((ushort)(short)(Camera.main.transform.position.x * 1000));
+				data[1] = unchecked((ushort)(short)(Camera.main.transform.position.y * 1000));
+				data[2] = unchecked((ushort)(short)(Camera.main.transform.position.z * 1000));
+				data[3] = unchecked((ushort)(short)(Camera.main.transform.eulerAngles.x * 10));
+				data[4] = unchecked((ushort)(short)(Camera.main.transform.eulerAngles.y * 10));
+				data[5] = unchecked((ushort)(short)(Camera.main.transform.eulerAngles.z * 10));
+				
+				// robot x,z (in mm) and orientation (in 1/10 of degrees)
+				if (thymioIsTracked)
+				{
+					GameObject generator = GameObject.Find("PanelGenerator");
+					data[6] = unchecked((ushort)(short)(generator.transform.position.x * 1000));
+					data[7] = unchecked((ushort)(short)(generator.transform.position.z * 1000));
+					data[8] = unchecked((ushort)(short)(generator.transform.eulerAngles.y * 10));
+				}
+				else
+				{
+					for (var i = 6; i < 9; ++i)
+						data[i] = 0;
+				}
+			}
+			else
+			{
+				// board not tracked, fill with 0
+				for (var i = 0; i < 9; ++i)
+					data[i] = 0;
+			}
+			
+			// recording duration (in s)
+			data[9] = unchecked((ushort)recordingDuration);
+			// timeline left and right poses (in ratio of duration between 0 and 10000)
+			data[10] = unchecked((ushort)((timelineViewStart - recordingStartTime) * 10000 / recordingDuration));
+			data[11] = unchecked((ushort)((timelineViewStop - recordingStartTime) * 10000 / recordingDuration));
+			// row of selected event, -1 if none
+			data[12] = selectedPanel != null ? selectedPanel.setId : unchecked((ushort)(short)(-1));
+			// app state (recording/stopped, tracking status)
+			data[13] = unchecked((ushort)(
+				(recording ? (1<<0) : 0) |
+				(boardIsTracked ? (1<<1) : 0) |
+				(thymioIsTracked ? (1<<2) : 0)
+			));
+			
 			stream.SendAsebaMessage(0, 1, data); 
 		}
 	}
@@ -421,6 +466,7 @@ public class AsebaListener : MonoBehaviour
 		EventActionsSetPanel panel = (EventActionsSetPanel) Instantiate(
 			panelPrefab, generator.transform.position, generator.transform.rotation
 		);
+		panel.setId = setId;
 		panel.renderer.material.mainTexture = tex;
 		const float scale = 0.025f / 256;
 		panel.transform.localScale = new Vector3(tex.width * scale, tex.height * scale, 0);
