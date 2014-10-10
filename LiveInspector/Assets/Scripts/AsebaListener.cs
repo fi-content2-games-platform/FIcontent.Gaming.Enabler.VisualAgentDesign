@@ -367,7 +367,7 @@ public class AsebaListener : MonoBehaviour
 	{
 		if (stream.Connected)
 		{
-			ushort[] data = new ushort[14];
+			ushort[] data = new ushort[15];
 			
 			// content
 			if (boardIsTracked)
@@ -403,13 +403,17 @@ public class AsebaListener : MonoBehaviour
 			
 			// recording duration (in s)
 			data[9] = unchecked((ushort)recordingDuration);
-			// timeline left and right poses (in ratio of duration between 0 and 10000)
+			// timeline left and right positions (in ratio of duration between 0 and 10000)
 			data[10] = unchecked((ushort)((timelineViewStart - recordingStartTime) * 10000 / recordingDuration));
 			data[11] = unchecked((ushort)((timelineViewStop - recordingStartTime) * 10000 / recordingDuration));
-			// row of selected event, -1 if none
+			// row of selected set, -1 if none
 			data[12] = selectedPanel != null ? selectedPanel.setId : unchecked((ushort)(short)(-1));
+			// time of selected set (in ratio of duration between 0 and 10000)
+			data[13] = selectedPanel != null ? 
+				unchecked((ushort)((selectedPanel.creationTime - recordingStartTime) * 10000 / recordingDuration)) :
+				unchecked((ushort)(short)(-1));
 			// app state (recording/stopped, tracking status)
-			data[13] = unchecked((ushort)(
+			data[14] = unchecked((ushort)(
 				(recording ? (1<<0) : 0) |
 				(boardIsTracked ? (1<<1) : 0) |
 				(thymioIsTracked ? (1<<2) : 0)
