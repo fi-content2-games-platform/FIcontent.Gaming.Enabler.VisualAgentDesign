@@ -415,7 +415,7 @@ public class AsebaListener : MonoBehaviour
 								(thymioIsTracked ? (1 << 2) : 0)
 			));
 			
-						stream.SendAsebaMessage (0, 1, data); 
+						stream.SendAsebaMessage (0, 2, data); 
 				}
 		}
 	
