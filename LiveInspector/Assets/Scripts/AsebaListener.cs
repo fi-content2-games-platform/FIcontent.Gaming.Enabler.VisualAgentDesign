@@ -434,7 +434,7 @@ public class AsebaListener : MonoBehaviour
 						return;
 
 				// we are only interested in user event 0 for now
-				if (type != 0)
+				if (type != 1)
 						return;
 			
 				// deserialize data
